@@ -2,10 +2,10 @@
 require File.expand_path('../lib/ironman-client/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["TODO: Write your name"]
+  gem.authors       = ["Su Jie"]
   gem.email         = ["skywalker418@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{API Client for Ironman}
+  gem.summary       = %q{API Client for Ironman}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)

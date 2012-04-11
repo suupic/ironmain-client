@@ -38,7 +38,6 @@ module Ironman
               res = JSON.parse([:code => 0, :data => JSON.parse(res.body)].to_json)
 	      return res
             rescue JSON::ParserError => e
-#              p "JSON::PareserError: #{res.body}"
 	      res = JSON.parse([:code => -1, :message => "JSON::PareserError: #{res.body}"].to_json)
 	      return res
             end
@@ -49,12 +48,6 @@ module Ironman
         end  
       end 
     end
-
-    class Person < Hashie::Dash
-      property :name, :required => true
-      property :email
-      property :occupation, :default => 'Rubyist'
-    end  
   end
 end
   
