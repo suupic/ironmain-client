@@ -14,12 +14,11 @@ module Ironman
         end
 
 	def servers_by_product_id(product_id)
-	  url = "/api/v1/products/#{product_id}"
+	  url = "/api/v1/products/#{product_id}/servers"
 	  res = get(url)
 	  if res[0]['code'] == -1
-            res
 	  else
-            res[0]['data'].collect { |data| "#{data['server_ip_address_internal']}" if data['product_id'] == product_id && !data['server_ip_address_internal'].empty? }.compact
+            res[0]['data'].collect { |data| "#{data['server_ip_address_internal']}" if !data['server_ip_address_internal'].empty? }.compact
 	  end
 	end	
 
