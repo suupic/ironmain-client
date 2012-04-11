@@ -1,6 +1,6 @@
 # Ironman::Client
 
-TODO: Write a gem description
+A client for my pravite API service
 
 ## Installation
 
