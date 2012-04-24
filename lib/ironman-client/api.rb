@@ -11,53 +11,19 @@ module Ironman
       class << self
         def connect_to(server, port)
           @server = "http://#{server}:#{port}"
-
         end
 
-	def servers_by_product_id(product_id)
-	  url = "/api/v1/products/#{product_id}/servers"
-	  res = get(url)
-	  if res[0]['code'] == -1
-	  else
-	    m = Hashie::Mash.new
-	    m.id = res[0]['data'][0]['product_id']
-	    m.name = res[0]['data'][0]['product_name']
-	    m.deploy_path = res[0]['data'][0]['product_deploy_path']
-	    m.server_ip_list = res[0]['data'].collect { |data| "#{data['server_ip_address_internal']}" if !data['server_ip_address_internal'].empty? }.compact
-	    return m
-	  end
+	def servers_list_for(product_name)
+	  url = "/api/v1/products/#{product_name}"
+	  m = get(url)
+	  m.server_ip_list
 	end	
 
-	def servers_by_product_name(product_name)
-	  url = "/api/v1/products/name/#{product_name}"
-	  res = get(url)
-	  if res[0]['code'] == -1
-	  else
-	    m = Hashie::Mash.new
-	    m.id = res[0]['data'][0]['product_id']
-	    m.name = res[0]['data'][0]['product_name']
-	    m.deploy_path = res[0]['data'][0]['product_deploy_path']
-	    m.server_ip_list = res[0]['data'].collect { |data| "#{data['server_ip_address_internal']}" if !data['server_ip_address_internal'].empty? }.compact
-	    return m
-	  end
-	end	
-
-	def products
+	def products_list
 	  url = "/api/v1/products"
-	  res = get(url)
-	  if res[0]['code'] == -1
-	  else
-            products = []
-	    res[0]['data'].each do |d|
-              m = Hashie::Mash.new
-	      m.id = d['id']
-	      m.name = d['name']
-	      m.package_name = d['package_name']
-	      m.deploy_path = d['deploy_path']
-	      products << m
-	    end
-	    return products
-	  end
+
+	  m = get(url)
+	  m.products_list
 	end	
 
         private
@@ -69,18 +35,29 @@ module Ironman
         def query_data(url)
           uri = URI(url)
           uri.query = URI.encode_www_form({})
+
 	  begin
             res = Net::HTTP.get_response(uri)
-            begin
-              res = JSON.parse([:code => 0, :data => JSON.parse(res.body)].to_json)
-	      return res
-            rescue JSON::ParserError => e
-	      res = JSON.parse([:code => -1, :message => "JSON::PareserError: #{res.body}"].to_json)
-	      return res
-            end
-	  rescue Errno::ECONNREFUSED => e
-            p "[ERROR] #{__FILE__}<#{__LINE__}> : #{e}"
-	    exit
+	  rescue Net::HTTPNotFound
+            logger.debug "404 not found when Query: #{url}"
+	    exit 1
+          rescue e
+#           logger.error "e=#{e}"
+	  end
+
+	  begin
+            res = JSON.parse(res.body)
+	  rescue
+#           logger.error "Parse Error when load data from #{url}"
+            exit 1
+          end
+
+          m = Hashie::Mash.new(res)
+	  if m.run_status == 0 
+	    return m
+	  else
+#           logger.error "Run Failed, exit.."
+            exit 1
 	  end
         end  
       end 
