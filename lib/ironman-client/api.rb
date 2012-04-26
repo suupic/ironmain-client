@@ -22,6 +22,12 @@ module Ironman
 	  m.server_ip_list
 	end	
 
+	def deploy_path_for(product_name)
+	  url = "/api/v1/products/#{product_name}"
+	  m = get(url)
+	  m.deploy_path
+	end	
+
 	def products_list
 	  url = "/api/v1/products"
 
